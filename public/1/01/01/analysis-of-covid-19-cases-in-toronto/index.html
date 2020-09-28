@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.75.1" />
+
+
+<title>Analysis of COVID-19 cases in Toronto - A Hugo website</title>
+<meta property="og:title" content="Analysis of COVID-19 cases in Toronto - A Hugo website">
+
+
+  <link href='../../../../favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="../../../../css/fonts.css" media="all">
+<link rel="stylesheet" href="../../../../css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="../../../../" class="nav-logo">
+    <img src="../../../../images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="../../../../about/">About</a></li>
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">6 min read</span>
+    
+
+    <h1 class="article-title">Analysis of COVID-19 cases in Toronto</h1>
+
+    
+    <span class="article-date">0001-01-01</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Code and data supporting this analysis is available at: “<a href="https://github.com/zhoufanx/STA304-Assignment1" class="uri">https://github.com/zhoufanx/STA304-Assignment1</a>”.</p>
+<p>We use <code>R</code> <span class="citation">(R Core Team 2020)</span> and packages <code>tidyverse</code> <span class="citation">(Wickham et al. 2019)</span>, <code>visdat</code> <span class="citation">(Tierney 2017)</span>, <code>labelled</code> <span class="citation">(Larmarange 2020)</span>, <code>opendatatoronto</code> <span class="citation">(Gelfand 2020)</span>, <code>dplyr</code> <span class="citation">(Wickham et al. 2020)</span>, <code>qwraps2</code> <span class="citation">(DeWitt 2020)</span> for this analysis.</p>
+<div id="abstract" class="section level1">
+<h1>Abstract:</h1>
+<p>“We investigate the data about COVID-19 Cases in Toronto. By analyzing, results showed that age group, gender and source of infection distribution of cases and the out come of these Cases. These results are important because COVID-19 has become a common human problem this year, and our analysis provides more information to the public.”</p>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>At present, Novel Coronavirus, which is also called COVID-19, is spreading in more than 100 countries and regions around the world, and the number of cases exceeds 100,000. The epidemic trend of COVID-19 obviously shows that it is becoming a pandemic. How to control the spread of the epidemic becomes a common problem globally. Toronto is facing the same problem, on January 23, the first identified case of COVID-19 in Canada was admitted to Sunnybrook Health Sciences Center in Toronto.<span class="citation">(Tuite et al. 2020)</span> We analyzed the data about COVID-19 cases in Toronto and found that there are some characteristics in these cases.</p>
+<p>In our analysis, we analyzed the data set of COVID-19 Cases in Toronto which is the source from opendatatoronto package. We looked at variables which represent age group, source of infection, outcome and gender of these COVID-19 cases. We observed that the distribution of these cases
+differs in different age group, different gender and different source of infection.</p>
+<p>We compared different cases in terms of their age, gender and their source of infection and we found that the young people are more likely to be infected. Also, among the cases of different genders, the proportion of women is higher than that of men. At the same time, most of the infection cases come from close contact and outbreak associated. However, we did not look at other variables like hospital course or Cases in ICU. In addition, we did not have the age distribution of fatal cases. These factors may show the public more detailed information about this COVID-19 virus. Future work should be targeted at more influencing factors and case status.</p>
+</div>
+<div id="data-discussion" class="section level1">
+<h1>Data discussion</h1>
+<p>The COVID-19 cases in Toronto data set contains demographic, geographic, and severity information about thses cases and collect all confirmed and probable cases reported to Toronto Public Health. The data collection start from the first case found in January 2020. This data set combines data from the provincial communicable disease reporting system (iPHIS) and Toronto’s custom COVID-19 case management system (CORES) into a complete report. However, there is a limitation to this data. For the purpose of timeliness and accuracy, this data will be completely refreshed and overwritten each week <span class="citation">(Gelfand 2020)</span>.</p>
+<p>There are 18 variables and 17872 observations in this data set and their values are listed in the table below:</p>
+<pre><code>## tibble [17,872 × 18] (S3: tbl_df/tbl/data.frame)
+##  $ _id                   : int [1:17872] 143647 143648 143649 143650 143651 ...
+##  $ Assigned_ID           : int [1:17872] 1 2 3 4 5 ...
+##  $ Outbreak Associated   : chr [1:17872] &quot;Sporadic&quot; &quot;Sporadic&quot; ...
+##  $ Age Group             : chr [1:17872] &quot;50 to 59 Years&quot; &quot;50 to 59 Years&quot; ...
+##  $ Neighbourhood Name    : chr [1:17872] &quot;Willowdale East&quot; &quot;Willowdale East&quot; ...
+##  $ FSA                   : chr [1:17872] &quot;M2N&quot; &quot;M2N&quot; ...
+##  $ Source of Infection   : chr [1:17872] &quot;Travel&quot; &quot;Travel&quot; ...
+##  $ Classification        : chr [1:17872] &quot;CONFIRMED&quot; &quot;CONFIRMED&quot; ...
+##  $ Episode Date          : chr [1:17872] &quot;2020-01-22&quot; &quot;2020-01-21&quot; ...
+##  $ Reported Date         : chr [1:17872] &quot;2020-01-23&quot; &quot;2020-01-23&quot; ...
+##  $ Client Gender         : chr [1:17872] &quot;FEMALE&quot; &quot;MALE&quot; ...
+##  $ Outcome               : chr [1:17872] &quot;RESOLVED&quot; &quot;RESOLVED&quot; ...
+##  $ Currently Hospitalized: chr [1:17872] &quot;No&quot; &quot;No&quot; ...
+##  $ Currently in ICU      : chr [1:17872] &quot;No&quot; &quot;No&quot; ...
+##  $ Currently Intubated   : chr [1:17872] &quot;No&quot; &quot;No&quot; ...
+##  $ Ever Hospitalized     : chr [1:17872] &quot;No&quot; &quot;Yes&quot; ...
+##  $ Ever in ICU           : chr [1:17872] &quot;No&quot; &quot;No&quot; ...
+##  $ Ever Intubated        : chr [1:17872] &quot;No&quot; &quot;No&quot; ...</code></pre>
+<p>Below is a graph showing the type pattern of these 18 variables. From the graph we can see that all of variables have valid values, it means that there is no missing value.</p>
+<p><img src="../../../../post/2015-07-23-r-rmarkdown_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+All of variable names are shown below, we will choose Age_group, Source_of_Infection, Outcome and Client_Gender to analyze age, source if infection, outcome of cases and gender seprately.</p>
+<pre><code>##  [1] &quot;_id&quot;                    &quot;Assigned_ID&quot;            &quot;Outbreak_Associated&quot;   
+##  [4] &quot;Age_Group&quot;              &quot;Neighbourhood_Name&quot;     &quot;FSA&quot;                   
+##  [7] &quot;Source_of_Infection&quot;    &quot;Classification&quot;         &quot;Episode_Date&quot;          
+## [10] &quot;Reported_Date&quot;          &quot;Client_Gender&quot;          &quot;Outcome&quot;               
+## [13] &quot;Currently_Hospitalized&quot; &quot;Currently_in_ICU&quot;       &quot;Currently_Intubated&quot;   
+## [16] &quot;Ever_Hospitalized&quot;      &quot;Ever_in_ICU&quot;            &quot;Ever_Intubated&quot;</code></pre>
+</div>
+<div id="graphs" class="section level1">
+<h1>graphs</h1>
+<p>There are 4 bar charts below:</p>
+<p><img src="../../../../post/2015-07-23-r-rmarkdown_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="../../../../post/2015-07-23-r-rmarkdown_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+<img src="../../../../post/2015-07-23-r-rmarkdown_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+<img src="../../../../post/2015-07-23-r-rmarkdown_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="graph-discussion" class="section level1">
+<h1>Graph discussion</h1>
+<p>The first bar chart shows that the age group distribution of cases, we found that the age groups of 20-59 years are the main proportion of cases. It means that young and middle-aged people are more likely to be infected.</p>
+<p>The second bar chat shows that the gender distribution of cases. The gender of main cases are male and female. The number of infected women is higher than the number of infected men. However, we can not conclude that women is more likely to be infected, since we can see the difference is not much big. It needs more data and more examinations to find out the relationship between gender and COVID-19 cases.</p>
+<p>The third bar chart provides information about the source of infection for each cases. From the graph, we can see that the most people are infected because of close contact and outbreak associated. In other words, these two sources are the main cause of infection.The public should avoid doing this to prevent infection.</p>
+<p>The lase bar chart is about the outcome of these cases. We can find that 84% cases are resolved, only few cases are still active. The death rate of all cases is 6.6%. The public should actively face the epidemic so that they can be treated more effectively.</p>
+</div>
+<div id="weaknesses-and-next-steps" class="section level1">
+<h1>Weaknesses and next steps</h1>
+<p>My weaknesses:</p>
+<ul>
+<li><p>In gender distribution of cases, the gender of some cases is unknown, which may cause the loss of information so that we may get a biased result.</p></li>
+<li><p>There are some other variables like hospital course or cases in ICU may also provide useful information for the public and it may also allow us to draw more accurate conclusions about the COVID-19 cases.</p></li>
+<li><p>we did not have the age distribution of fatal cases. It can help us better analyze the harm of the epidemic so that medical institutions may provide better treatment options.</p></li>
+</ul>
+<p>Next steps:</p>
+<ul>
+<li><p>Investigate more variables of cases.</p></li>
+<li><p>Collect more numeric related data to build statistical model for analysis.</p></li>
+<li><p>Make up for those missing values so that we can get a more accurate result.</p></li>
+</ul>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-citeqwraps2">
+<p>DeWitt, Peter. 2020. <em>Qwraps2: Quick Wraps 2</em>. <a href="https://github.com/dewittpe/qwraps2/">https://github.com/dewittpe/qwraps2/</a>.</p>
+</div>
+<div id="ref-citeopendatatoronto">
+<p>Gelfand, Sharla. 2020. <em>Opendatatoronto: Access the City of Toronto Open Data Portal</em>.</p>
+</div>
+<div id="ref-citelabelled">
+<p>Larmarange, Joseph. 2020. <em>Labelled: Manipulating Labelled Data</em>. <a href="http://larmarange.github.io/labelled/">http://larmarange.github.io/labelled/</a>.</p>
+</div>
+<div id="ref-citeR">
+<p>R Core Team. 2020. <em>R: A Language and Environment for Statistical Computing</em>. Vienna, Austria: R Foundation for Statistical Computing. <a href="https://www.R-project.org/">https://www.R-project.org/</a>.</p>
+</div>
+<div id="ref-citevisdat">
+<p>Tierney, Nicholas. 2017. “Visdat: Visualising Whole Data Frames.” <em>JOSS</em> 2 (16): 355. <a href="https://doi.org/10.21105/joss.00355">https://doi.org/10.21105/joss.00355</a>.</p>
+</div>
+<div id="ref-tuite2020estimation">
+<p>Tuite, Ashleigh R, Isaac I Bogoch, Ryan Sherbo, Alexander Watts, David Fisman, and Kamran Khan. 2020. “Estimation of Coronavirus Disease 2019 (Covid-19) Burden and Potential for International Dissemination of Infection from Iran.” <em>Annals of Internal Medicine</em> 172 (10): 699–701.</p>
+</div>
+<div id="ref-citetidyverse">
+<p>Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686">https://doi.org/10.21105/joss.01686</a>.</p>
+</div>
+<div id="ref-citedplyr">
+<p>Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2020. <em>Dplyr: A Grammar of Data Manipulation</em>.</p>
+</div>
+</div>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="../../../../index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="../../../../images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="../../../../js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

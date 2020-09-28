@@ -1,0 +1,138 @@
+---
+title: "Analysis of COVID-19 cases in Toronto"
+author: "Fanxi Zhou"
+date: "2020/9/27"
+output: pdf_document
+bibliography: citations.bib
+tags:
+- R Markdown
+- plot
+- regression
+categories: R
+---
+
+Code and data supporting this analysis is available at: "https://github.com/zhoufanx/STA304-Assignment1".
+
+We use `R` [@citeR] and packages `tidyverse` [@citetidyverse], `visdat` [@citevisdat], `labelled` [@citelabelled], `opendatatoronto` [@citeopendatatoronto], `dplyr` [@citedplyr], `qwraps2` [@citeqwraps2] for this analysis.
+
+# Abstract:
+
+"We investigate the data about COVID-19 Cases in Toronto. By analyzing, results showed that age group, gender and source of infection distribution of cases and the out come of these Cases. These results are important because COVID-19 has become a common human problem this year, and our analysis provides more information to the public."
+
+
+# Introduction
+
+At present, Novel Coronavirus, which is also called COVID-19, is spreading in more than 100 countries and regions around the world, and the number of cases exceeds 100,000. The epidemic trend of COVID-19 obviously shows that it is becoming a pandemic. How to control the spread of the epidemic becomes a common problem globally. Toronto is facing the same problem, on January 23, the first identified case of COVID-19 in Canada was admitted to Sunnybrook Health Sciences Center in Toronto.[@tuite2020estimation] We analyzed the data about COVID-19 cases in Toronto and found that there are some characteristics in these cases.
+
+In our analysis, we analyzed the data set of COVID-19 Cases in Toronto which is the source from opendatatoronto package. We looked at variables which represent age group, source of infection, outcome and gender of these COVID-19 cases. We observed that the distribution of these cases
+differs in different age group, different gender and different source of infection.
+
+We compared different cases in terms of their age, gender and their source of infection and we found that the young people are more likely to be infected. Also, among the cases of different genders, the proportion of women is higher than that of men. At the same time, most of the infection cases come from close contact and outbreak associated. However, we did not look at other variables like hospital course or Cases in ICU. In addition, we did not have the age distribution of fatal cases. These factors may show the public more detailed information about this COVID-19 virus. Future work should be targeted at more influencing factors and case status.
+
+# Data discussion
+
+The COVID-19 cases in Toronto data set contains demographic, geographic, and severity information about thses cases  and collect all confirmed and probable cases reported to Toronto Public Health. The data collection start from the first case found in January 2020. This data set combines data from the provincial communicable disease reporting system (iPHIS) and Toronto's custom COVID-19 case management system (CORES) into a complete report. However, there is a limitation to this data. For the purpose of timeliness and accuracy, this data will be completely refreshed and overwritten each week [@citeopendatatoronto].
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(visdat)
+library(labelled)
+library(opendatatoronto)
+library(dplyr)
+library(tidyverse)
+library(qwraps2)
+```
+
+There are 18 variables and 17872 observations in this data set and their values are listed in the table below:
+```{r}
+# show_package("97c25f5b-7542-40d4-b7fa-ef46e9442016")
+cov19_resource<-list_package_resources("64b54586-6180-4485-83eb-81e8fae3b8fe")
+COV19_data <- cov19_resource %>% get_resource()
+str(COV19_data, vec.len  = 2)
+
+```
+
+
+Below is a graph showing the type pattern of these 18 variables. From the graph we can see that all of variables have valid values, it means that there is no missing value.
+
+```{r}
+visdat::vis_dat(COV19_data)
+```
+All of variable names are shown below, we will choose Age_group, Source_of_Infection, Outcome and Client_Gender to analyze age, source if infection, outcome of cases and gender seprately.
+```{r}
+names(COV19_data)<-str_replace_all(names(COV19_data), c(" " = "_"))
+colnames(COV19_data)
+new_data <- select(COV19_data, "Age_Group","Source_of_Infection","Outcome",
+                   "Client_Gender")
+```
+# graphs
+
+There are 4 bar charts below: 
+
+```{r}
+plt1 <- ggplot(new_data)+ geom_bar(aes(Age_Group, fill = ..count..),  width = 0.5) + 
+      labs(title="Bar Chart1", 
+           subtitle="age group distribution of cases", 
+           caption="Source: COVID-19 Cases in Toronto dataset") + theme(axis.text.x = element_text(angle=30, vjust=0.8,hjust = 0.8))+scale_fill_gradient(low="blue", high="red")
+
+plt1
+```
+
+```{r}
+plt2 <- ggplot(new_data)+ geom_bar(aes(x=Client_Gender,fill=..count..),  width = 0.5, ) + 
+      labs(title="Bar Chart2", 
+           subtitle="gender distribution of cases", 
+           caption="Source: COVID-19 Cases in Toronto dataset") +
+      theme(axis.text.x = element_text(angle=65, vjust=0.6))+ theme_classic()+scale_fill_gradient(low="yellow", high="tomato2")
+plt2
+```
+```{r}
+plt3 <- ggplot(new_data)+ geom_bar(aes(x=Source_of_Infection,fill=..count..),  width = 0.5) + 
+      labs(title="Bar Chart3", 
+           subtitle="source of infection distribution of cases", 
+           caption="Source: COVID-19 Cases in Toronto dataset",pos = 40) +
+      theme(axis.text.x = element_text(angle=30, vjust=0.8,hjust = 0.8))+scale_fill_gradient(low="blue", high="red")
+plt3
+```
+```{r}
+plt4 <- ggplot(new_data)+ geom_bar(aes(x=Outcome),  width = 0.5, fill="light blue") + 
+      labs(title="Bar Chart4", 
+           subtitle="outcome of cases", 
+           caption="Source: COVID-19 Cases in Toronto dataset") +
+      theme(axis.text.x = element_text(angle=65, vjust=0.6))+ theme_classic()+ geom_text(stat='count', aes(Outcome,label=..count..), vjust=-0.3,col="white")
+plt4
+
+```
+
+# Graph discussion
+
+The first bar chart shows that the age group distribution of cases, we found that the age groups of 20-59 years are the main proportion of cases. It means that young and middle-aged people are more likely to be infected.
+
+The second bar chat shows that the gender distribution of cases. The gender of main cases are male and female. The number of infected women is higher than the number of infected men. However, we can not conclude that women is more likely to be infected, since we can see the difference is not much big. It needs more data and more examinations to find out the relationship between gender and COVID-19 cases.
+
+The third bar chart provides information about the source of infection for each cases. From the graph, we can see that the most people are infected because of close contact and outbreak associated. In other words, these two sources are the main cause of infection.The public should avoid doing this to prevent infection.
+
+The lase bar chart is about the outcome of these cases. We can find that 84% cases are resolved, only few cases are still active. The death rate of all cases is 6.6%. The public should actively face the epidemic so that they can be treated more effectively.
+
+# Weaknesses and next steps
+
+My weaknesses:
+
+- In gender distribution of cases, the gender of some cases is unknown, which may cause the loss of information so that we may get a biased result.
+
+- There are some other variables like hospital course or cases in ICU may also provide useful information for the public and it may also allow us to draw more accurate conclusions about the COVID-19 cases.
+
+- we did not have the age distribution of fatal cases. It can help us better analyze the harm of the epidemic so that medical institutions may provide better treatment options.
+
+Next steps:
+
+- Investigate more variables of cases.
+
+- Collect more numeric related data to build statistical model for analysis.
+
+- Make up for those missing values so that we can get a more accurate result.
+
+# References
+
